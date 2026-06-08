@@ -28,15 +28,15 @@ func _ready():
 	%LoadButton.pressed.connect(_load_dialog)
 	%BackButton.pressed.connect(_on_back)
 
-	_name_edit.text_changed.connect(func(t): _canvas.update_map_property("display_name", t); _mark_dirty())
-	_desc_edit.text_changed.connect(func(t): _canvas.update_map_property("description", t); _mark_dirty())
+	_name_edit.text_changed.connect(func(t): if _updating_ui: return; _canvas.update_map_property("display_name", t); _mark_dirty())
+	_desc_edit.text_changed.connect(func(t): if _updating_ui: return; _canvas.update_map_property("description", t); _mark_dirty())
 	_map_w_spin.value_changed.connect(func(_v): _update_map_size())
 	_map_h_spin.value_changed.connect(func(_v): _update_map_size())
 	_ground_picker.color_changed.connect(func(c): _canvas.update_map_property("ground_color", "#" + c.to_html(false)))
 
 	for side_name in ["attacker", "defender"]:
 		for field in ["x", "y", "w", "h"]:
-			_zone_spins[side_name][field].value_changed.connect(func(v): _update_zone(side_name, field, v))
+			_zone_spins[side_name][field].value_changed.connect(_update_zone.bind(side_name, field))
 
 	_canvas.data_changed.connect(_on_canvas_data_changed)
 
@@ -180,6 +180,7 @@ func _refresh_all_ui():
 
 func _on_canvas_data_changed():
 	_mark_dirty()
+	_refresh_all_ui()
 
 
 # ---- UI Control Handlers ----

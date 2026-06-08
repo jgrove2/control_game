@@ -23,29 +23,109 @@ func _ready() -> void:
 
 
 func _load_map() -> void:
-	_map_node = config.map_definition.get_scene().instantiate()
+	var md := config.map_definition
+	_map_node = Node2D.new()
+	_map_node.name = md.id if md.id else "Map"
+
+	if md.json_path:
+		_build_from_json(md.json_path)
+	elif md.scene_path:
+		_build_from_scene(md.scene_path)
+
 	add_child(_map_node)
-
-	# If the MapDefinition has a json_path, extract deployment zone info
-	if config.map_definition.json_path:
-		var jmd := JsonMapDefinition.new(config.map_definition.json_path)
-		if jmd.is_valid():
-			_deployment_zones = jmd.get_deployment_zones()
-			_store_zone_overlays()
+	_add_camera()
 
 
-# Store zone visual data from the generated scene so deploy logic can reference it
-func _store_zone_overlays() -> void:
-	for ch in _map_node.get_children():
-		if ch.name.ends_with("DeployZone") and ch is Polygon2D:
-			var side := "attacker" if ch.name.begins_with("Attacker") else "defender"
-			if not _deployment_zones.has(side):
-				_deployment_zones[side] = {
-					"x": ch.position.x,
-					"y": ch.position.y,
-					"w": ch.polygon[2].x if ch.polygon.size() >= 3 else 200,
-					"h": ch.polygon[2].y if ch.polygon.size() >= 3 else 300
-				}
+func _build_from_json(path: String) -> void:
+	var jmd := JsonMapDefinition.new(path)
+	if not jmd.is_valid():
+		return
+	_deployment_zones = jmd.get_deployment_zones()
+
+	var ms := jmd.get_map_size()
+	var gc := jmd.get_ground_color()
+
+	var ground := Polygon2D.new()
+	ground.name = "Ground"
+	ground.color = gc
+	ground.polygon = PackedVector2Array([
+		Vector2(0, 0), Vector2(ms.x, 0), Vector2(ms.x, ms.y), Vector2(0, ms.y)
+	])
+	_map_node.add_child(ground)
+
+	for s in jmd.get_shapes():
+		var n := JsonMapDefinition._build_polygon(s, false)
+		if n:
+			_map_node.add_child(n)
+
+	for b in jmd.get_barriers():
+		var n := JsonMapDefinition._build_polygon(b, true)
+		if n:
+			_map_node.add_child(n)
+
+	for side in ["attacker", "defender"]:
+		var zd := _deployment_zones.get(side, {})
+		if zd.is_empty():
+			continue
+		var zone := Polygon2D.new()
+		zone.name = side.capitalize() + "DeployZone"
+		var zx := zd.get("x", 0)
+		var zy := zd.get("y", 0)
+		var zw := zd.get("w", 200)
+		var zh := zd.get("h", 300)
+		zone.polygon = PackedVector2Array([
+			Vector2(0, 0), Vector2(zw, 0), Vector2(zw, zh), Vector2(0, zh)
+		])
+		zone.position = Vector2(zx, zy)
+		zone.color = JsonMapDefinition.zone_fill_color(side)
+		_map_node.add_child(zone)
+
+
+func _build_from_scene(path: String) -> void:
+	var packed := load(path)
+	if not packed:
+		return
+	var scene := packed.instantiate()
+	for child in scene.get_children():
+		scene.remove_child(child)
+		_map_node.add_child(child)
+	scene.queue_free()
+
+	for child in _map_node.get_children():
+		if not (child is Polygon2D):
+			continue
+		var side := ""
+		if child.name.begins_with("Attacker") or child.name.begins_with("attacker"):
+			side = "attacker"
+		elif child.name.begins_with("Defender") or child.name.begins_with("defender"):
+			side = "defender"
+		else:
+			continue
+		if _deployment_zones.has(side):
+			continue
+		var p := child.polygon
+		_deployment_zones[side] = {
+			"x": child.position.x,
+			"y": child.position.y,
+			"w": p[2].x if p.size() >= 3 else 200,
+			"h": p[2].y if p.size() >= 3 else 300
+		}
+
+
+func _add_camera() -> void:
+	var cam := Camera2D.new()
+	cam.name = "Camera2D"
+	cam.enabled = true
+
+	var side := "attacker" if config.player_side == CombatConfig.Side.ATTACKER else "defender"
+	var zd := _deployment_zones.get(side, {})
+	if not zd.is_empty():
+		cam.position = Vector2(
+			zd.get("x", 0) + zd.get("w", 200) / 2.0,
+			zd.get("y", 0) + zd.get("h", 300) / 2.0
+		)
+
+	_map_node.add_child(cam)
 
 
 func get_attacker_deploy_zone() -> Dictionary:

@@ -9,21 +9,6 @@ class_name MapDefinition
 @export var thumbnail: Texture2D
 
 
-func get_scene() -> PackedScene:
-	if scene_path:
-		return load(scene_path)
-	if json_path:
-		var jmd := JsonMapDefinition.new(json_path)
-		if jmd.is_valid():
-			# Generate a temporary PackedScene from the JSON
-			var root := jmd.generate_scene()
-			var packed := PackedScene.new()
-			packed.pack(root)
-			root.queue_free()
-			return packed
-	return null
-
-
 static func from_json_file(path: String) -> MapDefinition:
 	var jmd := JsonMapDefinition.new(path)
 	if not jmd.is_valid():
