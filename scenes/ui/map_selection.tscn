@@ -1,0 +1,115 @@
+[gd_scene format=3 uid="uid://dsi0hi5wr1jru"]
+
+[ext_resource type="Script" uid="uid://kory6830dgup" path="res://scripts/ui/map_selection.gd" id="1"]
+
+[node name="MapSelection" type="CanvasLayer" unique_id=326195701]
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="." unique_id=994211229]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.7717797, 0.77177966, 0.7717796, 0.6)
+
+[node name="Panel" type="Panel" parent="." unique_id=1772031999]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -280.0
+offset_right = 320.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=1019062647]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="TitleRow" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=2086572978]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Back" type="Button" parent="Panel/VBoxContainer/TitleRow" unique_id=1269700354]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "< Back"
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/TitleRow" unique_id=2125085528]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 36
+text = "SELECT MAP"
+horizontal_alignment = 1
+
+[node name="TitleSpacer" type="Control" parent="Panel/VBoxContainer/TitleRow" unique_id=1240031055]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+
+[node name="SpacerTop" type="Control" parent="Panel/VBoxContainer" unique_id=2026108644]
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="Panel/VBoxContainer" unique_id=343584888]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
+
+[node name="Map1" type="Button" parent="Panel/VBoxContainer/GridContainer" unique_id=1931772721]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 120)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "MAP 1"
+
+[node name="Map2" type="Button" parent="Panel/VBoxContainer/GridContainer" unique_id=1985946061]
+modulate = Color(0.45, 0.45, 0.45, 0.7)
+custom_minimum_size = Vector2(160, 120)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+disabled = true
+text = "MAP 2"
+
+[node name="Map3" type="Button" parent="Panel/VBoxContainer/GridContainer" unique_id=149028340]
+modulate = Color(0.45, 0.45, 0.45, 0.7)
+custom_minimum_size = Vector2(160, 120)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+disabled = true
+text = "MAP 3"
+
+[node name="Map4" type="Button" parent="Panel/VBoxContainer/GridContainer" unique_id=1965190187]
+modulate = Color(0.45, 0.45, 0.45, 0.7)
+custom_minimum_size = Vector2(160, 120)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+disabled = true
+text = "MAP 4"
+
+[node name="Map5" type="Button" parent="Panel/VBoxContainer/GridContainer" unique_id=554727361]
+modulate = Color(0.45, 0.45, 0.45, 0.7)
+custom_minimum_size = Vector2(160, 120)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+disabled = true
+text = "MAP 5"
+
+[node name="SpacerBottom" type="Control" parent="Panel/VBoxContainer" unique_id=389446468]
+layout_mode = 2
+size_flags_vertical = 2

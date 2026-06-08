@@ -1,0 +1,139 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/game_ui.gd" id="1"]
+
+[node name="GameUI" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="BottomBox" type="Panel" parent="."]
+offset_left = -314.0
+offset_top = -262.0
+offset_right = 314.0
+offset_bottom = 0.0
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+modulate = Color(0.22, 0.22, 0.24, 1.0)
+
+[node name="StartCombatButton" type="Button" parent="BottomBox"]
+unique_name_in_owner = true
+visible = false
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+custom_minimum_size = Vector2(200, 45)
+text = "START COMBAT"
+theme_override_font_sizes/font_size = 20
+
+[node name="Margin" type="MarginContainer" parent="BottomBox"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Grid" type="GridContainer" parent="BottomBox/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 6
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="Slot1" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot2" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot3" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot4" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot5" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot6" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot7" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot8" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot9" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot10" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot11" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)
+
+[node name="Slot12" type="Panel" parent="BottomBox/Margin/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+modulate = Color(0.12, 0.12, 0.12, 1.0)

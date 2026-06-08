@@ -1,0 +1,362 @@
+[gd_scene format=3 uid="uid://ffu8vkvqpwss"]
+
+[ext_resource type="Script" uid="uid://dx7dqtmklks1n" path="res://scripts/ui/map_creator.gd" id="1"]
+[ext_resource type="Script" uid="uid://68t6p1dtq2ri" path="res://scripts/ui/map_creator_canvas.gd" id="2"]
+
+[node name="MapCreator" type="CanvasLayer" unique_id=93762275]
+script = ExtResource("1")
+
+[node name="MainVBox" type="VBoxContainer" parent="." unique_id=381326901]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Toolbar" type="HBoxContainer" parent="MainVBox" unique_id=931450311]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainVBox/Toolbar" unique_id=739272056]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = " MAP CREATOR"
+
+[node name="VSep" type="VSeparator" parent="MainVBox/Toolbar" unique_id=798934850]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="MainVBox/Toolbar" unique_id=1199804592]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NewButton" type="Button" parent="MainVBox/Toolbar" unique_id=524663781]
+unique_name_in_owner = true
+layout_mode = 2
+text = "New"
+
+[node name="SaveButton" type="Button" parent="MainVBox/Toolbar" unique_id=1670136977]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save"
+
+[node name="SaveAsButton" type="Button" parent="MainVBox/Toolbar" unique_id=2094267409]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save As"
+
+[node name="LoadButton" type="Button" parent="MainVBox/Toolbar" unique_id=1807927586]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Load"
+
+[node name="VSep2" type="VSeparator" parent="MainVBox/Toolbar" unique_id=1120950435]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MainVBox/Toolbar" unique_id=231838876]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Back"
+
+[node name="Split" type="HSplitContainer" parent="MainVBox" unique_id=760661424]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+split_offsets = PackedInt32Array(-380)
+split_offset = -380
+
+[node name="CanvasContainer" type="VBoxContainer" parent="MainVBox/Split" unique_id=2121363042]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Canvas" type="Node2D" parent="MainVBox/Split/CanvasContainer" unique_id=382046233]
+unique_name_in_owner = true
+script = ExtResource("2")
+
+[node name="Camera2D" type="Camera2D" parent="MainVBox/Split/CanvasContainer/Canvas" unique_id=988272374]
+
+[node name="InfoBar" type="HBoxContainer" parent="MainVBox/Split/CanvasContainer" unique_id=894287145]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="InfoLabel" type="Label" parent="MainVBox/Split/CanvasContainer/InfoBar" unique_id=2108818801]
+self_modulate = Color(0.8, 0.8, 0.8, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "  Right-drag to pan. Scroll to zoom."
+
+[node name="Scroll" type="ScrollContainer" parent="MainVBox/Split" unique_id=16556719]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Panel" type="VBoxContainer" parent="MainVBox/Split/Scroll" unique_id=1829703421]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MapSectionTitle" type="Label" parent="MainVBox/Split/Scroll/Panel" unique_id=1827451596]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "MAP PROPERTIES"
+
+[node name="NameRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=162884487]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/NameRow" unique_id=1779823940]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Name"
+
+[node name="NameEdit" type="LineEdit" parent="MainVBox/Split/Scroll/Panel/NameRow" unique_id=1753772865]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Map name"
+
+[node name="DescRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=773692782]
+layout_mode = 2
+
+[node name="DescLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/DescRow" unique_id=880229666]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Desc"
+
+[node name="DescEdit" type="LineEdit" parent="MainVBox/Split/Scroll/Panel/DescRow" unique_id=384353098]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Description"
+
+[node name="SizeRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=1565361081]
+layout_mode = 2
+
+[node name="SizeLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/SizeRow" unique_id=15670984]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Size"
+
+[node name="SizeHBox" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel/SizeRow" unique_id=2143622409]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1915819610]
+layout_mode = 2
+text = "W:"
+
+[node name="MapWidth" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1845997556]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 100.0
+max_value = 10000.0
+step = 50.0
+value = 1600.0
+
+[node name="HLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1304266161]
+layout_mode = 2
+text = "H:"
+
+[node name="MapHeight" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1676154599]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 100.0
+max_value = 10000.0
+step = 50.0
+value = 900.0
+
+[node name="GroundRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=11731462]
+layout_mode = 2
+
+[node name="GroundLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/GroundRow" unique_id=1529902873]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Ground"
+
+[node name="GroundColor" type="ColorPickerButton" parent="MainVBox/Split/Scroll/Panel/GroundRow" unique_id=1258423393]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.29, 0.486, 0.247, 1)
+
+[node name="HSep" type="HSeparator" parent="MainVBox/Split/Scroll/Panel" unique_id=1771218570]
+layout_mode = 2
+
+[node name="ZoneSectionTitle" type="Label" parent="MainVBox/Split/Scroll/Panel" unique_id=1364274662]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "DEPLOYMENT ZONES"
+
+[node name="AttackerZone" type="VBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=729946293]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AttackerHeader" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel/AttackerZone" unique_id=2093337141]
+layout_mode = 2
+
+[node name="AttackerIcon" type="ColorRect" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerHeader" unique_id=916235924]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0, 0.5, 1, 0.6)
+
+[node name="AttackerLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerHeader" unique_id=504147424]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "  Attacker"
+
+[node name="AttackerSpacer" type="Control" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerHeader" unique_id=425013492]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AttackerGrid" type="GridContainer" parent="MainVBox/Split/Scroll/Panel/AttackerZone" unique_id=705311959]
+layout_mode = 2
+columns = 4
+
+[node name="AXL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=2070185070]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "X"
+
+[node name="AYL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=473079932]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Y"
+
+[node name="AWL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=151142313]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "W"
+
+[node name="AHL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=258405533]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "H"
+
+[node name="AttackerX" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=1939702685]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 50.0
+
+[node name="AttackerY" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=8118422]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 300.0
+
+[node name="AttackerW" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=58056874]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 200.0
+
+[node name="AttackerH" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=180081305]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 300.0
+
+[node name="DefenderZone" type="VBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=2030608959]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="DefenderHeader" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel/DefenderZone" unique_id=1245958000]
+layout_mode = 2
+
+[node name="DefenderIcon" type="ColorRect" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderHeader" unique_id=822657645]
+custom_minimum_size = Vector2(12, 12)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 0.2, 0.2, 0.6)
+
+[node name="DefenderLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderHeader" unique_id=1954332001]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "  Defender"
+
+[node name="DefenderSpacer" type="Control" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderHeader" unique_id=1797693578]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DefenderGrid" type="GridContainer" parent="MainVBox/Split/Scroll/Panel/DefenderZone" unique_id=854460740]
+layout_mode = 2
+columns = 4
+
+[node name="DXL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1273564542]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "X"
+
+[node name="DYL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=592671256]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Y"
+
+[node name="DWL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=983667259]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "W"
+
+[node name="DHL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1267659215]
+self_modulate = Color(0.7, 0.7, 0.7, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "H"
+
+[node name="DefenderX" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1194337665]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 1350.0
+
+[node name="DefenderY" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=79348833]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 300.0
+
+[node name="DefenderW" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1627340592]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 200.0
+
+[node name="DefenderH" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1838552815]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+min_value = -10000.0
+max_value = 10000.0
+step = 10.0
+value = 300.0

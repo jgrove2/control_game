@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://ddgeamueklli"]
+
+[ext_resource type="Script" uid="uid://bkyrkohr7xdrn" path="res://scripts/ui/main_menu.gd" id="1"]
+
+[node name="MainMenu" type="CanvasLayer" unique_id=48679776]
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1554998120]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(1, 1, 1, 0.6)
+
+[node name="Panel" type="Panel" parent="." unique_id=1368635052]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -240.0
+offset_right = 200.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=304681318]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer" unique_id=644616154]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "CONTROL GAME"
+horizontal_alignment = 1
+
+[node name="SpacerTop" type="Control" parent="Panel/VBoxContainer" unique_id=874432223]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Campaign" type="Button" parent="Panel/VBoxContainer" unique_id=647133727]
+unique_name_in_owner = true
+modulate = Color(0.45, 0.45, 0.45, 0.7)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+disabled = true
+text = "Campaign"
+
+[node name="Skirmish" type="Button" parent="Panel/VBoxContainer" unique_id=340942046]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Skirmish"
+
+[node name="MapCreator" type="Button" parent="Panel/VBoxContainer" unique_id=1402941083]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Map Creator"
+
+[node name="Settings" type="Button" parent="Panel/VBoxContainer" unique_id=847692803]
+unique_name_in_owner = true
+modulate = Color(0.45, 0.45, 0.45, 0.7)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+disabled = true
+text = "Settings"
+
+[node name="Exit" type="Button" parent="Panel/VBoxContainer" unique_id=95164780]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Exit"
+
+[node name="SpacerBottom" type="Control" parent="Panel/VBoxContainer" unique_id=1416552845]
+layout_mode = 2
+size_flags_vertical = 3

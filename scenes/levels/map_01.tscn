@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dvjnlaw5shn8c"]
+
+[ext_resource type="Script" uid="uid://cqcai8p6g7plr" path="res://scripts/levels/map_01.gd" id="1"]
+
+[node name="Map01" type="Node2D" unique_id=534705242]
+script = ExtResource("1")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=494075191]
+
+[node name="Ground" type="Polygon2D" parent="." unique_id=143370084]
+position = Vector2(204, 105)
+color = Color(0.55, 0.42, 0.3, 1)
+polygon = PackedVector2Array(-200, -100, 1200, -100, 1200, 600, -200, 600)
