@@ -5,14 +5,10 @@ class_name MapCreatorCanvas
 signal data_changed()
 
 var map_data: Dictionary = {}
-
-var _camera: Camera2D
 var _panning: bool = false
 
+
 func _ready():
-	_camera = $Camera2D
-	print("canvas _ready, camera = ", $Camera2D)
-	_camera.make_current()
 	new_map()
 
 
@@ -66,22 +62,14 @@ func _get_map_size() -> Vector2:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	print("canvas input: ", event)
-	if event is InputEventMouseButton or event is InputEventMouseMotion:
-		print("canvas got: ", event.get_class())
-	if not is_instance_valid(_camera):
-		_camera = $Camera2D
-		if not is_instance_valid(_camera):
-			return
-
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 
 		if mb.button_index == MOUSE_BUTTON_WHEEL_UP and mb.pressed:
-			_camera.zoom *= 1.1
+			_zoom_at(1.1)
 			get_viewport().set_input_as_handled()
 		elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN and mb.pressed:
-			_camera.zoom *= 0.9
+			_zoom_at(0.9)
 			get_viewport().set_input_as_handled()
 		elif mb.button_index == MOUSE_BUTTON_RIGHT:
 			_panning = mb.pressed
@@ -93,7 +81,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		var mm := event as InputEventMouseMotion
 		if _panning:
-			_camera.position -= mm.relative / _camera.zoom
+			position -= mm.relative / scale
 
 
 func update_map_property(key: String, value):
@@ -111,15 +99,11 @@ func update_deployment_zone(side: String, key: String, value: float):
 	map_data["deployment_zones"] = zones
 	queue_redraw()
 	data_changed.emit()
-	
 
 
-func _zoom_at(screen_pos: Vector2, factor: float) -> void:
-	# World point under the cursor before zoom
-	var before: Vector2 = get_global_mouse_position()
-	_camera.zoom *= factor
-	_camera.zoom = _camera.zoom.clamp(Vector2(0.1, 0.1), Vector2(10, 10))
-	# World point under the cursor after zoom
-	var after: Vector2 = get_global_mouse_position()
-	# Shift camera so the same world point stays under the cursor
-	_camera.position += before - after
+func _zoom_at(factor: float) -> void:
+	var mouse_global := get_global_mouse_position()
+	var mouse_local := (mouse_global - position) / scale
+	scale *= factor
+	scale = scale.clamp(Vector2(0.1, 0.1), Vector2(10, 10))
+	position = mouse_global - mouse_local * scale

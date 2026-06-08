@@ -74,8 +74,6 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 script = ExtResource("2")
 
-[node name="Camera2D" type="Camera2D" parent="MainVBox/Split/CanvasContainer/Canvas" unique_id=988272374]
-
 [node name="InfoBar" type="HBoxContainer" parent="MainVBox/Split/CanvasContainer" unique_id=894287145]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
