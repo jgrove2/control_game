@@ -1,16 +1,15 @@
 class_name CombatManager extends Node
 
-enum Phase { DEPLOYMENT, COMBAT }
-
 var config: CombatConfig
-var phase: Phase = Phase.DEPLOYMENT
-
-var _soldiers: Array[Soldier] = []
-var _game_ui: GameUI
 var _map_node: Node2D
-var _deployment_zones: Dictionary = {}  # populated from JSON map data
+var _map_size: Vector2 = Vector2(1600, 900)
+var _deployment_zones: Dictionary = {}
+var _camera: Camera2D
+var _zoom_min := 1.0   # <-- add this here, at class scope
 
-var _selected_placement_slot: int = -1
+const ZOOM_MAX := 5.0
+const ZOOM_START := 2.0
+const PAN_SPEED := 500.0
 
 
 func _init(config: CombatConfig) -> void:
@@ -18,8 +17,10 @@ func _init(config: CombatConfig) -> void:
 
 
 func _ready() -> void:
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	set_process(true)
 	_load_map()
-	_setup_deployment()
+	get_viewport().size_changed.connect(_update_min_zoom)
 
 
 func _load_map() -> void:
@@ -35,21 +36,59 @@ func _load_map() -> void:
 	add_child(_map_node)
 	_add_camera()
 
+func _process(delta: float) -> void:
+	var dir := Vector2.ZERO
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+		dir.y -= 1
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+		dir.y += 1
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+		dir.x -= 1
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+		dir.x += 1
+	if dir != Vector2.ZERO:
+		_camera.position += dir.normalized() * PAN_SPEED * delta / _camera.zoom.x
+		_clamp_camera()
+
+
+func _clamp_camera() -> void:
+	var half_view := get_viewport().get_visible_rect().size / (2.0 * _camera.zoom.x)
+	# If the view is bigger than the map on an axis, lock to map center on that axis.
+	var min_x: float
+	var max_x: float
+	if half_view.x * 2.0 >= _map_size.x:
+		min_x = _map_size.x / 2.0
+		max_x = _map_size.x / 2.0
+	else:
+		min_x = half_view.x
+		max_x = _map_size.x - half_view.x
+
+	var min_y: float
+	var max_y: float
+	if half_view.y * 2.0 >= _map_size.y:
+		min_y = _map_size.y / 2.0
+		max_y = _map_size.y / 2.0
+	else:
+		min_y = half_view.y
+		max_y = _map_size.y - half_view.y
+
+	_camera.position.x = clamp(_camera.position.x, min_x, max_x)
+	_camera.position.y = clamp(_camera.position.y, min_y, max_y)
 
 func _build_from_json(path: String) -> void:
 	var jmd := JsonMapDefinition.new(path)
 	if not jmd.is_valid():
 		return
-	_deployment_zones = jmd.get_deployment_zones()
 
-	var ms := jmd.get_map_size()
+	_map_size = jmd.get_map_size()
+	_deployment_zones = jmd.get_deployment_zones()
 	var gc := jmd.get_ground_color()
 
 	var ground := Polygon2D.new()
 	ground.name = "Ground"
 	ground.color = gc
 	ground.polygon = PackedVector2Array([
-		Vector2(0, 0), Vector2(ms.x, 0), Vector2(ms.x, ms.y), Vector2(0, ms.y)
+		Vector2(0, 0), Vector2(_map_size.x, 0), Vector2(_map_size.x, _map_size.y), Vector2(0, _map_size.y)
 	])
 	_map_node.add_child(ground)
 
@@ -63,171 +102,82 @@ func _build_from_json(path: String) -> void:
 		if n:
 			_map_node.add_child(n)
 
-	for side in ["attacker", "defender"]:
-		var zd := _deployment_zones.get(side, {})
-		if zd.is_empty():
-			continue
-		var zone := Polygon2D.new()
-		zone.name = side.capitalize() + "DeployZone"
-		var zx := zd.get("x", 0)
-		var zy := zd.get("y", 0)
-		var zw := zd.get("w", 200)
-		var zh := zd.get("h", 300)
-		zone.polygon = PackedVector2Array([
-			Vector2(0, 0), Vector2(zw, 0), Vector2(zw, zh), Vector2(0, zh)
-		])
-		zone.position = Vector2(zx, zy)
-		zone.color = JsonMapDefinition.zone_fill_color(side)
-		_map_node.add_child(zone)
+	for b in jmd.get_biomes():
+		var n := JsonMapDefinition._build_biome_polygon(b)
+		if n:
+			_map_node.add_child(n)
+
+	for s in jmd.get_sand_bags():
+		var n := JsonMapDefinition._build_sand_bag_polygon(s)
+		if n:
+			_map_node.add_child(n)
 
 
 func _build_from_scene(path: String) -> void:
-	var packed := load(path)
+	var packed: PackedScene = load(path)
 	if not packed:
 		return
-	var scene := packed.instantiate()
+	var scene: Node = packed.instantiate()
 	for child in scene.get_children():
 		scene.remove_child(child)
 		_map_node.add_child(child)
 	scene.queue_free()
 
-	for child in _map_node.get_children():
-		if not (child is Polygon2D):
-			continue
-		var side := ""
-		if child.name.begins_with("Attacker") or child.name.begins_with("attacker"):
-			side = "attacker"
-		elif child.name.begins_with("Defender") or child.name.begins_with("defender"):
-			side = "defender"
-		else:
-			continue
-		if _deployment_zones.has(side):
-			continue
-		var p := child.polygon
-		_deployment_zones[side] = {
-			"x": child.position.x,
-			"y": child.position.y,
-			"w": p[2].x if p.size() >= 3 else 200,
-			"h": p[2].y if p.size() >= 3 else 300
-		}
-
 
 func _add_camera() -> void:
-	var cam := Camera2D.new()
-	cam.name = "Camera2D"
-	cam.enabled = true
+	_camera = Camera2D.new()
+	_camera.name = "Camera2D"
+	_camera.enabled = true
+
+	_update_min_zoom()
+	var start_zoom: float = max(ZOOM_START, _zoom_min)
+	_camera.zoom = Vector2(start_zoom, start_zoom)
 
 	var side := "attacker" if config.player_side == CombatConfig.Side.ATTACKER else "defender"
-	var zd := _deployment_zones.get(side, {})
+	var zd: Dictionary = _deployment_zones.get(side, {})
 	if not zd.is_empty():
-		cam.position = Vector2(
+		_camera.position = Vector2(
 			zd.get("x", 0) + zd.get("w", 200) / 2.0,
 			zd.get("y", 0) + zd.get("h", 300) / 2.0
 		)
+	else:
+		_camera.position = _map_size / 2.0
 
-	_map_node.add_child(cam)
+	_map_node.add_child(_camera)
+	_clamp_camera()
 
-
-func get_attacker_deploy_zone() -> Dictionary:
-	return _deployment_zones.get("attacker", {})
-
-
-func get_defender_deploy_zone() -> Dictionary:
-	return _deployment_zones.get("defender", {})
-
-
-func _setup_deployment() -> void:
-	_create_ui()
-	_game_ui.set_mode(GameUI.Mode.DEPLOYMENT)
-
-	_game_ui.slot_clicked.connect(_on_deploy_slot_clicked)
-
-	for i in range(config.troop_count):
-		_game_ui.assign_unit_to_slot(i, null)
-
-
-func _create_ui() -> void:
-	var ui_scene: PackedScene = preload("res://scenes/ui/game_ui.tscn")
-	_game_ui = ui_scene.instantiate()
-	add_child(_game_ui)
-	_game_ui.start_combat_pressed.connect(_on_start_combat)
-
-
-func _find_spawn_points() -> Array[Vector2]:
-	var points: Array[Vector2] = []
-	for child in _map_node.get_children():
-		if child is Marker2D and child.is_in_group(&"spawn_point"):
-			points.append(child.position)
-	return points
-
-
-func _on_deploy_slot_clicked(slot_index: int, soldier: Soldier) -> void:
-	if soldier != null:
-		_remove_unit(slot_index, soldier)
-		return
-	_selected_placement_slot = slot_index
-
-
-func _remove_unit(slot_index: int, soldier: Soldier) -> void:
-	_soldiers.erase(soldier)
-	soldier.queue_free()
-	_game_ui.assign_unit_to_slot(slot_index, null)
-
-
-func _try_place_unit(global_pos: Vector2) -> void:
-	var soldier: Soldier = config.troop_scene.instantiate()
-	soldier.unit_name = "Squad %d" % (_selected_placement_slot + 1)
-	soldier.team = Soldier.Team.PLAYER
-	soldier.position = _map_node.to_local(global_pos)
-	_map_node.add_child(soldier)
-	_game_ui.assign_unit_to_slot(_selected_placement_slot, soldier)
-	_soldiers.append(soldier)
-	_selected_placement_slot = -1
-
-
-func _on_start_combat() -> void:
-	phase = Phase.COMBAT
-
-	_game_ui.slot_clicked.disconnect(_on_deploy_slot_clicked)
-	_game_ui.start_combat_pressed.disconnect(_on_start_combat)
-
-	_game_ui.unit_selected.connect(_on_unit_selected)
-	_game_ui.unit_deselected.connect(_on_unit_deselected)
-	_game_ui.set_mode(GameUI.Mode.COMBAT)
-
-
-func _on_unit_selected(soldier: Soldier, index: int) -> void:
-	for s in _soldiers:
-		s.set_selected(s == soldier)
-
-
-func _on_unit_deselected() -> void:
-	for s in _soldiers:
-		s.set_selected(false)
-
+func _update_min_zoom() -> void:
+	# zoom that makes the view exactly fit the map on each axis;
+	# take the larger so neither axis ever shows past the map edge
+	var vp := get_viewport().get_visible_rect().size
+	var fit_x := vp.x / _map_size.x
+	var fit_y := vp.y / _map_size.y
+	_zoom_min = max(fit_x, fit_y)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if phase == Phase.DEPLOYMENT:
-		if event is InputEventMouseButton \
-				and event.pressed \
-				and event.button_index == MOUSE_BUTTON_LEFT:
-			if _selected_placement_slot >= 0:
-				_try_place_unit((event as InputEventMouseButton).global_position)
-			else:
-				_game_ui.deselect_all()
-			get_viewport().set_input_as_handled()
-
-		if event.is_action_pressed("ui_cancel"):
-			get_parent().return_to_menu()
-			get_viewport().set_input_as_handled()
-		return
-
-	if event is InputEventMouseButton \
-			and event.pressed \
-			and event.button_index == MOUSE_BUTTON_LEFT:
-		_game_ui.deselect_all()
-		get_viewport().set_input_as_handled()
-
 	if event.is_action_pressed("ui_cancel"):
 		get_parent().return_to_menu()
 		get_viewport().set_input_as_handled()
+		return
+
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		var zoom_dir := 0
+		if mb.button_index == MOUSE_BUTTON_WHEEL_UP and mb.pressed:
+			zoom_dir = 1
+		elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN and mb.pressed:
+			zoom_dir = -1
+
+		if zoom_dir != 0:
+			var factor := 1.1 if zoom_dir > 0 else 0.9
+			var old_zoom := _camera.zoom.x
+			var z: float = clamp(_camera.zoom.x * factor, _zoom_min, ZOOM_MAX)
+			_camera.zoom = Vector2(z, z)
+
+			var mouse_viewport := get_viewport().get_mouse_position()
+			var viewport_size := get_viewport().get_visible_rect().size
+			var world_before := _camera.position + (mouse_viewport - viewport_size / 2.0) / old_zoom
+			var world_after := _camera.position + (mouse_viewport - viewport_size / 2.0) / _camera.zoom.x
+			_camera.position += world_before - world_after
+			_clamp_camera()
+			get_viewport().set_input_as_handled()

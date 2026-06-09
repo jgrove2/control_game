@@ -8,12 +8,15 @@ class_name MapCreator
 @onready var _desc_edit: LineEdit = %DescEdit
 @onready var _map_w_spin: SpinBox = %MapWidth
 @onready var _map_h_spin: SpinBox = %MapHeight
-@onready var _ground_picker: ColorPickerButton = %GroundColor
-
 @onready var _zone_spins: Dictionary = {
 	"attacker": {"x": %AttackerX, "y": %AttackerY, "w": %AttackerW, "h": %AttackerH},
 	"defender": {"x": %DefenderX, "y": %DefenderY, "w": %DefenderW, "h": %DefenderH}
 }
+
+@onready var _biome_type: OptionButton = %BiomeType
+@onready var _menu_panel: Control = %Scroll
+@onready var _biome_layer: OptionButton = %BiomeLayer
+@onready var _sand_bag_layer: OptionButton = %SandBagLayer
 
 var _current_file_path: String = ""
 var _is_dirty: bool = false
@@ -32,7 +35,6 @@ func _ready():
 	_desc_edit.text_changed.connect(func(t): if _updating_ui: return; _canvas.update_map_property("description", t); _mark_dirty())
 	_map_w_spin.value_changed.connect(func(_v): _update_map_size())
 	_map_h_spin.value_changed.connect(func(_v): _update_map_size())
-	_ground_picker.color_changed.connect(func(c): _canvas.update_map_property("ground_color", "#" + c.to_html(false)))
 
 	for side_name in ["attacker", "defender"]:
 		for field in ["x", "y", "w", "h"]:
@@ -40,12 +42,31 @@ func _ready():
 
 	_canvas.data_changed.connect(_on_canvas_data_changed)
 
+	%AddBiome.pressed.connect(_on_add_biome)
+	%DeleteBiome.pressed.connect(_on_delete_biome)
+	%AddSandBag.pressed.connect(_on_add_sand_bag)
+	%DeleteSandBag.pressed.connect(_on_delete_sand_bag)
+
+	_biome_type.clear()
+	_biome_type.add_item("Water")
+	_biome_type.add_item("Sand")
+	_biome_type.add_item("Grass")
+
+	_biome_layer.clear()
+	_sand_bag_layer.clear()
+	for i in range(1, 7):
+		_biome_layer.add_item("Layer " + str(i))
+		_sand_bag_layer.add_item("Layer " + str(i))
+	_biome_layer.item_selected.connect(_on_biome_layer_changed)
+	_sand_bag_layer.item_selected.connect(_on_sand_bag_layer_changed)
+
+	_canvas.selection_changed.connect(_on_selection_changed)
+
+	_layout_menu()
+	get_viewport().size_changed.connect(_layout_menu)
+
 	_new_map()
 
-func _input(event):
-	if event is InputEventMouseButton and event.pressed:
-		var c := get_viewport().gui_get_hovered_control()
-		print("hovered: ", c, "  path: ", c.get_path() if c else "NONE")
 
 # ---- Actions ----
 
@@ -164,7 +185,6 @@ func _refresh_all_ui():
 	var ms: Dictionary = data.get("map_size_px", {})
 	_map_w_spin.value = ms.get("x", 1600)
 	_map_h_spin.value = ms.get("y", 900)
-	_ground_picker.color = JsonMapDefinition.parse_color(data.get("ground_color", "#4a7c3f"))
 
 	var zones: Dictionary = data.get("deployment_zones", {})
 	for side_name in ["attacker", "defender"]:
@@ -172,6 +192,31 @@ func _refresh_all_ui():
 		for field in ["x", "y", "w", "h"]:
 			if _zone_spins.has(side_name) and _zone_spins[side_name].has(field):
 				_zone_spins[side_name][field].value = zd.get(field, 0)
+
+	_sync_layer_ui()
+
+	_updating_ui = false
+
+
+func _sync_layer_ui():
+	if _updating_ui:
+		return
+	_updating_ui = true
+
+	var biome_idx := _canvas.get_selected_biome_idx()
+	if biome_idx >= 0:
+		_biome_layer.select(_canvas.get_selected_biome_layer() - 1)
+		_biome_layer.disabled = false
+		_sand_bag_layer.disabled = true
+	else:
+		var sand_bag_idx := _canvas.get_selected_sand_bag_idx()
+		if sand_bag_idx >= 0:
+			_sand_bag_layer.select(_canvas.get_selected_sand_bag_layer() - 1)
+			_sand_bag_layer.disabled = false
+			_biome_layer.disabled = true
+		else:
+			_biome_layer.disabled = true
+			_sand_bag_layer.disabled = true
 
 	_updating_ui = false
 
@@ -192,7 +237,54 @@ func _update_map_size():
 	var h := _map_h_spin.value
 	_canvas.update_map_property("map_size_px", {"x": w, "y": h})
 
-func _update_zone(side: String, field: String, value: float):
+func _update_zone(value: float, side: String, field: String):
 	if _updating_ui:
 		return
 	_canvas.update_deployment_zone(side, field, value)
+
+func _on_add_biome() -> void:
+	var sel := _biome_type.selected
+	if sel < 0:
+		return
+	var t: String = _biome_type.get_item_text(sel)
+	_canvas.add_biome(t.to_lower())
+
+func _on_delete_biome() -> void:
+	var idx := _canvas.get_selected_biome_idx()
+	if idx >= 0:
+		_canvas.delete_biome(idx)
+
+func _on_add_sand_bag() -> void:
+	_canvas.add_sand_bag()
+
+func _on_delete_sand_bag() -> void:
+	var idx := _canvas.get_selected_sand_bag_idx()
+	if idx >= 0:
+		_canvas.delete_sand_bag(idx)
+
+func _layout_menu() -> void:
+	_menu_panel.anchor_left = 0.75
+	_menu_panel.anchor_right = 1.0
+	_menu_panel.anchor_top = 0.0
+	_menu_panel.anchor_bottom = 1.0
+	_menu_panel.offset_left = 0
+	_menu_panel.offset_right = 0
+	_menu_panel.offset_top = 0
+	_menu_panel.offset_bottom = 0
+
+func _on_selection_changed(_drag_idx: int) -> void:
+	_sync_layer_ui()
+
+func _on_biome_layer_changed(item_idx: int) -> void:
+	if _updating_ui:
+		return
+	var biome_idx := _canvas.get_selected_biome_idx()
+	if biome_idx >= 0:
+		_canvas.set_biome_layer(biome_idx, item_idx + 1)
+
+func _on_sand_bag_layer_changed(item_idx: int) -> void:
+	if _updating_ui:
+		return
+	var sand_bag_idx := _canvas.get_selected_sand_bag_idx()
+	if sand_bag_idx >= 0:
+		_canvas.set_sand_bag_layer(sand_bag_idx, item_idx + 1)

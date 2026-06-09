@@ -41,7 +41,7 @@ func get_map_size() -> Vector2:
 	return Vector2(s.get("x", 1600), s.get("y", 900))
 
 func get_ground_color() -> Color:
-	return parse_color(_data.get("ground_color", "#4a7c3f"))
+	return parse_color(_data.get("ground_color", "#8B7355"))
 
 func get_shapes() -> Array:
 	return _data.get("shapes", [])
@@ -51,6 +51,12 @@ func get_barriers() -> Array:
 
 func get_deployment_zones() -> Dictionary:
 	return _data.get("deployment_zones", {})
+
+func get_biomes() -> Array:
+	return _data.get("biomes", [])
+
+func get_sand_bags() -> Array:
+	return _data.get("sand_bags", [])
 
 static func parse_color(hex: String) -> Color:
 	var h := hex.trim_prefix("#")
@@ -63,6 +69,13 @@ static func zone_fill_color(side_name: String) -> Color:
 
 static func zone_border_color(side_name: String) -> Color:
 	return Color(0, 0.5, 1, 0.5) if side_name == "attacker" else Color(1, 0.2, 0.2, 0.5)
+
+static func biome_color(biome_type: String) -> Color:
+	match biome_type:
+		"water": return Color(0.29, 0.56, 0.85)
+		"sand":  return Color(0.83, 0.65, 0.42)
+		"grass": return Color(0.49, 0.78, 0.31)
+		_:       return Color(0.49, 0.78, 0.31)
 
 func generate_scene() -> Node2D:
 	var root := Node2D.new()
@@ -97,6 +110,16 @@ func generate_scene() -> Node2D:
 		if n:
 			root.add_child(n)
 
+	for b in get_biomes():
+		var n := _build_biome_polygon(b)
+		if n:
+			root.add_child(n)
+
+	for s in get_sand_bags():
+		var n := _build_sand_bag_polygon(s)
+		if n:
+			root.add_child(n)
+
 	var zones := get_deployment_zones()
 	for side_name in ["attacker", "defender"]:
 		var zd: Dictionary = zones.get(side_name, {})
@@ -113,6 +136,7 @@ func generate_scene() -> Node2D:
 		])
 		zone.position = Vector2(zx, zy)
 		zone.color = zone_fill_color(side_name)
+		zone.z_index = 7
 		root.add_child(zone)
 
 	return root
@@ -152,4 +176,35 @@ static func _build_polygon(data: Dictionary, is_barrier: bool) -> Polygon2D:
 			pts.append(Vector2(cos(a), sin(a)) * radius)
 		node.polygon = pts
 
+	return node
+
+static func _build_biome_polygon(data: Dictionary) -> Polygon2D:
+	var node := Polygon2D.new()
+	node.name = "Biome"
+	var t: String = data.get("type", "grass")
+	var x: float = data.get("x", 0)
+	var y: float = data.get("y", 0)
+	var w: float = data.get("w", 100)
+	var h: float = data.get("h", 100)
+	node.position = Vector2(x, y)
+	node.color = biome_color(t)
+	node.z_index = data.get("layer", 1)
+	node.polygon = PackedVector2Array([
+		Vector2(0, 0), Vector2(w, 0), Vector2(w, h), Vector2(0, h)
+	])
+	return node
+
+static func _build_sand_bag_polygon(data: Dictionary) -> Polygon2D:
+	var node := Polygon2D.new()
+	node.name = "SandBag"
+	var x: float = data.get("x", 0)
+	var y: float = data.get("y", 0)
+	var w: float = data.get("w", 40)
+	var h: float = data.get("h", 40)
+	node.position = Vector2(x, y)
+	node.color = Color(0.82, 0.71, 0.55)
+	node.z_index = data.get("layer", 1)
+	node.polygon = PackedVector2Array([
+		Vector2(0, 0), Vector2(w, 0), Vector2(w, h), Vector2(0, h)
+	])
 	return node

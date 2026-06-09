@@ -3,6 +3,7 @@ extends Node2D
 class_name MapCreatorCanvas
 
 signal data_changed()
+signal selection_changed(drag_idx: int)
 
 var map_data: Dictionary = {}
 
@@ -18,6 +19,14 @@ var _resize_handles: Array[Dictionary] = []
 var _active_handle_idx: int = -1
 var _last_cursor: int = 0
 
+const BIOME_COLORS: Dictionary = {
+	"water": Color(0.29, 0.56, 0.85),
+	"sand": Color(0.83, 0.65, 0.42),
+	"grass": Color(0.49, 0.78, 0.31)
+}
+
+const SAND_BAG_COLOR: Color = Color(0.82, 0.71, 0.55)
+
 
 func _ready():
 	new_map()
@@ -28,13 +37,15 @@ func new_map():
 		"id": "new_map",
 		"display_name": "New Map",
 		"description": "",
-		"map_size_px": {"x": 1600, "y": 900},
-		"ground_color": "#4a7c3f",
+		"map_size_px": {"x": 1080, "y": 1920},
+		"ground_color": "#8B7355",
 		"shapes": [],
 		"barriers": [],
+		"biomes": [],
+		"sand_bags": [],
 		"deployment_zones": {
-			"attacker": {"x": 50, "y": 300, "w": 200, "h": 300},
-			"defender": {"x": 1350, "y": 300, "w": 200, "h": 300}
+			"attacker": {"x": 300, "y": 40, "w": 500, "h": 200},
+			"defender": {"x": 300, "y": 1690, "w": 500, "h": 200}
 		}
 	}
 	_rebuild_draggables()
@@ -53,8 +64,26 @@ func get_map_data() -> Dictionary:
 
 func _draw():
 	var ms := _get_map_size()
-	var gc: Color = JsonMapDefinition.parse_color(map_data.get("ground_color", "#4a7c3f"))
+	var gc: Color = JsonMapDefinition.parse_color(map_data.get("ground_color", "#8B7355"))
 	draw_rect(Rect2(Vector2.ZERO, ms), gc)
+
+	var biomes: Array = map_data.get("biomes", [])
+	var sand_bags: Array = map_data.get("sand_bags", [])
+	for layer in range(1, 7):
+		for bd in biomes:
+			if bd.get("layer", 1) != layer:
+				continue
+			var t: String = bd.get("type", "grass")
+			var col: Color = BIOME_COLORS.get(t, BIOME_COLORS["grass"])
+			var x: float = bd.get("x", 0)
+			var y: float = bd.get("y", 0)
+			draw_rect(Rect2(x, y, bd.get("w", 80), bd.get("h", 60)), col)
+		for sd in sand_bags:
+			if sd.get("layer", 1) != layer:
+				continue
+			var x: float = sd.get("x", 0)
+			var y: float = sd.get("y", 0)
+			draw_rect(Rect2(x, y, sd.get("w", 40), sd.get("h", 40)), SAND_BAG_COLOR)
 
 	var zones: Dictionary = map_data.get("deployment_zones", {})
 	for side_name in ["attacker", "defender"]:
@@ -77,6 +106,9 @@ func _draw():
 			if not zd.is_empty():
 				draw_rect(Rect2(zd.get("x", 0), zd.get("y", 0), zd.get("w", 200), zd.get("h", 300)),
 					Color.WHITE, false, 4.0)
+		elif drag_id.begins_with("biome_") or drag_id.begins_with("sand_bag_"):
+			var hr: Rect2 = _draggables[highlight_idx]["get_rect"].call()
+			draw_rect(hr, Color.WHITE, false, 4.0)
 
 	if _selected_idx >= 0:
 		for handle in _resize_handles:
@@ -131,6 +163,12 @@ func _rebuild_draggables() -> void:
 	_draggables.clear()
 	for side in ["attacker", "defender"]:
 		_draggables.append(_make_zone_draggable(side))
+	var biomes: Array = map_data.get("biomes", [])
+	for i in biomes.size():
+		_draggables.append(_make_biome_draggable(i))
+	var sand_bags: Array = map_data.get("sand_bags", [])
+	for i in sand_bags.size():
+		_draggables.append(_make_sand_bag_draggable(i))
 
 
 func _make_zone_draggable(side: String) -> Dictionary:
@@ -155,6 +193,64 @@ func _make_zone_draggable(side: String) -> Dictionary:
 	}
 
 
+func _make_biome_draggable(idx: int) -> Dictionary:
+	return {
+		"id": "biome_" + str(idx),
+		"get_rect": func() -> Rect2:
+			var biomes: Array = map_data.get("biomes", [])
+			if idx < 0 or idx >= biomes.size():
+				return Rect2(0, 0, 0, 0)
+			var bd: Dictionary = biomes[idx]
+			return Rect2(bd.get("x", 0), bd.get("y", 0), bd.get("w", 100), bd.get("h", 100)),
+		"set_pos": func(v: Vector2) -> void:
+			var biomes: Array = map_data.get("biomes", [])
+			if idx < 0 or idx >= biomes.size():
+				return
+			var bd: Dictionary = biomes[idx]
+			bd["x"] = v.x
+			bd["y"] = v.y
+			map_data["biomes"][idx] = bd
+			queue_redraw(),
+		"commit": func() -> void:
+			data_changed.emit(),
+		"get_resize_handles": func() -> Array[Dictionary]:
+			var dirs := ["nw", "n", "ne", "w", "e", "sw", "s", "se"]
+			var handles: Array[Dictionary] = []
+			for dir in dirs:
+				handles.append(_make_biome_resize_handle(idx, dir))
+			return handles,
+	}
+
+
+func _make_sand_bag_draggable(idx: int) -> Dictionary:
+	return {
+		"id": "sand_bag_" + str(idx),
+		"get_rect": func() -> Rect2:
+			var sand_bags: Array = map_data.get("sand_bags", [])
+			if idx < 0 or idx >= sand_bags.size():
+				return Rect2(0, 0, 0, 0)
+			var sd: Dictionary = sand_bags[idx]
+			return Rect2(sd.get("x", 0), sd.get("y", 0), sd.get("w", 40), sd.get("h", 40)),
+		"set_pos": func(v: Vector2) -> void:
+			var sand_bags: Array = map_data.get("sand_bags", [])
+			if idx < 0 or idx >= sand_bags.size():
+				return
+			var sd: Dictionary = sand_bags[idx]
+			sd["x"] = v.x
+			sd["y"] = v.y
+			map_data["sand_bags"][idx] = sd
+			queue_redraw(),
+		"commit": func() -> void:
+			data_changed.emit(),
+		"get_resize_handles": func() -> Array[Dictionary]:
+			var dirs := ["nw", "n", "ne", "w", "e", "sw", "s", "se"]
+			var handles: Array[Dictionary] = []
+			for dir in dirs:
+				handles.append(_make_sand_bag_resize_handle(idx, dir))
+			return handles,
+	}
+
+
 func _get_draggable_at(world_pos: Vector2) -> int:
 	for i in range(_draggables.size() - 1, -1, -1):
 		var rect: Rect2 = _draggables[i]["get_rect"].call()
@@ -172,6 +268,7 @@ func _select_item(idx: int) -> void:
 	_selected_idx = idx
 	_build_resize_handles()
 	queue_redraw()
+	selection_changed.emit(idx)
 
 
 func _deselect() -> void:
@@ -182,6 +279,7 @@ func _deselect() -> void:
 	_active_handle_idx = -1
 	_drag_offset = Vector2.ZERO
 	queue_redraw()
+	selection_changed.emit(-1)
 
 
 func _build_resize_handles() -> void:
@@ -278,6 +376,78 @@ func _make_zone_resize_handle(side: String, dir: String) -> Dictionary:
 	var commit := func() -> void:
 		var zd: Dictionary = map_data["deployment_zones"].get(side, {})
 		commit_deployment_zone(side, zd.get("x", 0), zd.get("y", 0))
+
+	return {
+		"id": "resize_" + dir,
+		"get_rect": get_rect,
+		"apply": apply,
+		"commit": commit,
+	}
+
+
+func _make_biome_resize_handle(idx: int, dir: String) -> Dictionary:
+	var get_rect := func() -> Rect2:
+		var biomes: Array = map_data.get("biomes", [])
+		if idx < 0 or idx >= biomes.size():
+			return Rect2(0, 0, 0, 0)
+		var bd: Dictionary = biomes[idx]
+		var r := Rect2(bd.get("x", 0), bd.get("y", 0), bd.get("w", 100), bd.get("h", 100))
+		var inv_scale: float = 1.0 / scale.x
+		return _handle_click_rect(r, dir, inv_scale)
+
+	var apply := func(mouse_world: Vector2) -> void:
+		var biomes: Array = map_data.get("biomes", [])
+		if idx < 0 or idx >= biomes.size():
+			return
+		var bd: Dictionary = biomes[idx]
+		var r := Rect2(bd.get("x", 0), bd.get("y", 0), bd.get("w", 100), bd.get("h", 100))
+		var new_r := _resize_rect(r, mouse_world, dir)
+		if new_r.size.x >= 20 and new_r.size.y >= 20:
+			bd["x"] = new_r.position.x
+			bd["y"] = new_r.position.y
+			bd["w"] = new_r.size.x
+			bd["h"] = new_r.size.y
+		map_data["biomes"][idx] = bd
+		queue_redraw()
+
+	var commit := func() -> void:
+		data_changed.emit()
+
+	return {
+		"id": "resize_" + dir,
+		"get_rect": get_rect,
+		"apply": apply,
+		"commit": commit,
+	}
+
+
+func _make_sand_bag_resize_handle(idx: int, dir: String) -> Dictionary:
+	var get_rect := func() -> Rect2:
+		var sand_bags: Array = map_data.get("sand_bags", [])
+		if idx < 0 or idx >= sand_bags.size():
+			return Rect2(0, 0, 0, 0)
+		var sd: Dictionary = sand_bags[idx]
+		var r := Rect2(sd.get("x", 0), sd.get("y", 0), sd.get("w", 40), sd.get("h", 40))
+		var inv_scale: float = 1.0 / scale.x
+		return _handle_click_rect(r, dir, inv_scale)
+
+	var apply := func(mouse_world: Vector2) -> void:
+		var sand_bags: Array = map_data.get("sand_bags", [])
+		if idx < 0 or idx >= sand_bags.size():
+			return
+		var sd: Dictionary = sand_bags[idx]
+		var r := Rect2(sd.get("x", 0), sd.get("y", 0), sd.get("w", 40), sd.get("h", 40))
+		var new_r := _resize_rect(r, mouse_world, dir)
+		if new_r.size.x >= 10 and new_r.size.y >= 10:
+			sd["x"] = new_r.position.x
+			sd["y"] = new_r.position.y
+			sd["w"] = new_r.size.x
+			sd["h"] = new_r.size.y
+		map_data["sand_bags"][idx] = sd
+		queue_redraw()
+
+	var commit := func() -> void:
+		data_changed.emit()
 
 	return {
 		"id": "resize_" + dir,
@@ -409,6 +579,119 @@ func commit_deployment_zone(side: String, x: float, y: float) -> void:
 	map_data["deployment_zones"] = zones
 	queue_redraw()
 	data_changed.emit()
+
+
+func add_biome(biome_type: String) -> void:
+	var biomes: Array = map_data.get("biomes", [])
+	var biome: Dictionary = {
+		"type": biome_type,
+		"x": 100 + biomes.size() * 30,
+		"y": 100 + biomes.size() * 30,
+		"w": 120,
+		"h": 80,
+		"layer": 1
+	}
+	biomes.append(biome)
+	map_data["biomes"] = biomes
+	_rebuild_draggables()
+	queue_redraw()
+	data_changed.emit()
+
+
+func set_biome_layer(idx: int, layer: int) -> void:
+	var biomes: Array = map_data.get("biomes", [])
+	if idx < 0 or idx >= biomes.size():
+		return
+	var bd: Dictionary = biomes[idx]
+	bd["layer"] = clamp(layer, 1, 6)
+	biomes[idx] = bd
+	map_data["biomes"] = biomes
+	queue_redraw()
+	data_changed.emit()
+
+
+func get_selected_biome_layer() -> int:
+	var idx := get_selected_biome_idx()
+	if idx < 0:
+		return 1
+	var biomes: Array = map_data.get("biomes", [])
+	return biomes[idx].get("layer", 1)
+
+
+func delete_biome(idx: int) -> void:
+	var biomes: Array = map_data.get("biomes", [])
+	if idx < 0 or idx >= biomes.size():
+		return
+	biomes.remove_at(idx)
+	map_data["biomes"] = biomes
+	_rebuild_draggables()
+	queue_redraw()
+	data_changed.emit()
+
+
+func add_sand_bag() -> void:
+	var sand_bags: Array = map_data.get("sand_bags", [])
+	var sand_bag: Dictionary = {
+		"x": 200 + sand_bags.size() * 25,
+		"y": 200 + sand_bags.size() * 25,
+		"w": 40,
+		"h": 40,
+		"layer": 1
+	}
+	sand_bags.append(sand_bag)
+	map_data["sand_bags"] = sand_bags
+	_rebuild_draggables()
+	queue_redraw()
+	data_changed.emit()
+
+
+func set_sand_bag_layer(idx: int, layer: int) -> void:
+	var sand_bags: Array = map_data.get("sand_bags", [])
+	if idx < 0 or idx >= sand_bags.size():
+		return
+	var sd: Dictionary = sand_bags[idx]
+	sd["layer"] = clamp(layer, 1, 6)
+	sand_bags[idx] = sd
+	map_data["sand_bags"] = sand_bags
+	queue_redraw()
+	data_changed.emit()
+
+
+func get_selected_sand_bag_layer() -> int:
+	var idx := get_selected_sand_bag_idx()
+	if idx < 0:
+		return 1
+	var sand_bags: Array = map_data.get("sand_bags", [])
+	return sand_bags[idx].get("layer", 1)
+
+
+func delete_sand_bag(idx: int) -> void:
+	var sand_bags: Array = map_data.get("sand_bags", [])
+	if idx < 0 or idx >= sand_bags.size():
+		return
+	sand_bags.remove_at(idx)
+	map_data["sand_bags"] = sand_bags
+	_rebuild_draggables()
+	queue_redraw()
+	data_changed.emit()
+
+
+func get_selected_biome_idx() -> int:
+	if _selected_idx < 0 or _selected_idx >= _draggables.size():
+		return -1
+	var drag_id: String = _draggables[_selected_idx].get("id", "")
+	if not drag_id.begins_with("biome_"):
+		return -1
+	return int(drag_id.trim_prefix("biome_"))
+
+
+func get_selected_sand_bag_idx() -> int:
+	if _selected_idx < 0 or _selected_idx >= _draggables.size():
+		return -1
+	var drag_id: String = _draggables[_selected_idx].get("id", "")
+	if not drag_id.begins_with("sand_bag_"):
+		return -1
+	return int(drag_id.trim_prefix("sand_bag_"))
 
 
 func _zoom_at(factor: float) -> void:

@@ -13,6 +13,25 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="CanvasContainer" type="VBoxContainer" parent="MainVBox" unique_id=2121363042]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Canvas" type="Node2D" parent="MainVBox/CanvasContainer" unique_id=382046233]
+unique_name_in_owner = true
+script = ExtResource("2")
+
+[node name="InfoBar" type="HBoxContainer" parent="MainVBox/CanvasContainer" unique_id=894287145]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="InfoLabel" type="Label" parent="MainVBox/CanvasContainer/InfoBar" unique_id=2108818801]
+self_modulate = Color(0.8, 0.8, 0.8, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "  Right-drag to pan. Scroll to zoom."
+
 [node name="Toolbar" type="HBoxContainer" parent="MainVBox" unique_id=931450311]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -58,93 +77,68 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Back"
 
-[node name="Split" type="HSplitContainer" parent="MainVBox" unique_id=760661424]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-split_offsets = PackedInt32Array(-380)
-split_offset = -380
-
-[node name="CanvasContainer" type="VBoxContainer" parent="MainVBox/Split" unique_id=2121363042]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Canvas" type="Node2D" parent="MainVBox/Split/CanvasContainer" unique_id=382046233]
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=16556719]
 unique_name_in_owner = true
-script = ExtResource("2")
 
-[node name="InfoBar" type="HBoxContainer" parent="MainVBox/Split/CanvasContainer" unique_id=894287145]
-custom_minimum_size = Vector2(0, 24)
-layout_mode = 2
-
-[node name="InfoLabel" type="Label" parent="MainVBox/Split/CanvasContainer/InfoBar" unique_id=2108818801]
-self_modulate = Color(0.8, 0.8, 0.8, 1)
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "  Right-drag to pan. Scroll to zoom."
-
-[node name="Scroll" type="ScrollContainer" parent="MainVBox/Split" unique_id=16556719]
-custom_minimum_size = Vector2(360, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Panel" type="VBoxContainer" parent="MainVBox/Split/Scroll" unique_id=1829703421]
+[node name="PanelContainer" type="PanelContainer" parent="Scroll" unique_id=186526330]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MapSectionTitle" type="Label" parent="MainVBox/Split/Scroll/Panel" unique_id=1827451596]
+[node name="Panel" type="VBoxContainer" parent="Scroll/PanelContainer" unique_id=85531711]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MapSectionTitle" type="Label" parent="Scroll/PanelContainer/Panel" unique_id=1827451596]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "MAP PROPERTIES"
 
-[node name="NameRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=162884487]
+[node name="NameRow" type="HBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=162884487]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/NameRow" unique_id=1779823940]
+[node name="NameLabel" type="Label" parent="Scroll/PanelContainer/Panel/NameRow" unique_id=1779823940]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 text = "Name"
 
-[node name="NameEdit" type="LineEdit" parent="MainVBox/Split/Scroll/Panel/NameRow" unique_id=1753772865]
+[node name="NameEdit" type="LineEdit" parent="Scroll/PanelContainer/Panel/NameRow" unique_id=1753772865]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Map name"
 
-[node name="DescRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=773692782]
+[node name="DescRow" type="HBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=773692782]
 layout_mode = 2
 
-[node name="DescLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/DescRow" unique_id=880229666]
+[node name="DescLabel" type="Label" parent="Scroll/PanelContainer/Panel/DescRow" unique_id=880229666]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 text = "Desc"
 
-[node name="DescEdit" type="LineEdit" parent="MainVBox/Split/Scroll/Panel/DescRow" unique_id=384353098]
+[node name="DescEdit" type="LineEdit" parent="Scroll/PanelContainer/Panel/DescRow" unique_id=384353098]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Description"
 
-[node name="SizeRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=1565361081]
+[node name="SizeRow" type="HBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=1565361081]
 layout_mode = 2
 
-[node name="SizeLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/SizeRow" unique_id=15670984]
+[node name="SizeLabel" type="Label" parent="Scroll/PanelContainer/Panel/SizeRow" unique_id=15670984]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 text = "Size"
 
-[node name="SizeHBox" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel/SizeRow" unique_id=2143622409]
+[node name="SizeHBox" type="HBoxContainer" parent="Scroll/PanelContainer/Panel/SizeRow" unique_id=2143622409]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="WLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1915819610]
+[node name="WLabel" type="Label" parent="Scroll/PanelContainer/Panel/SizeRow/SizeHBox" unique_id=1915819610]
 layout_mode = 2
 text = "W:"
 
-[node name="MapWidth" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1845997556]
+[node name="MapWidth" type="SpinBox" parent="Scroll/PanelContainer/Panel/SizeRow/SizeHBox" unique_id=1845997556]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 100.0
@@ -152,11 +146,11 @@ max_value = 10000.0
 step = 50.0
 value = 1600.0
 
-[node name="HLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1304266161]
+[node name="HLabel" type="Label" parent="Scroll/PanelContainer/Panel/SizeRow/SizeHBox" unique_id=1304266161]
 layout_mode = 2
 text = "H:"
 
-[node name="MapHeight" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/SizeRow/SizeHBox" unique_id=1676154599]
+[node name="MapHeight" type="SpinBox" parent="Scroll/PanelContainer/Panel/SizeRow/SizeHBox" unique_id=1676154599]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 100.0
@@ -164,80 +158,66 @@ max_value = 10000.0
 step = 50.0
 value = 900.0
 
-[node name="GroundRow" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=11731462]
+[node name="HSep" type="HSeparator" parent="Scroll/PanelContainer/Panel" unique_id=1771218570]
 layout_mode = 2
 
-[node name="GroundLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/GroundRow" unique_id=1529902873]
-custom_minimum_size = Vector2(60, 0)
-layout_mode = 2
-text = "Ground"
-
-[node name="GroundColor" type="ColorPickerButton" parent="MainVBox/Split/Scroll/Panel/GroundRow" unique_id=1258423393]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-color = Color(0.29, 0.486, 0.247, 1)
-
-[node name="HSep" type="HSeparator" parent="MainVBox/Split/Scroll/Panel" unique_id=1771218570]
-layout_mode = 2
-
-[node name="ZoneSectionTitle" type="Label" parent="MainVBox/Split/Scroll/Panel" unique_id=1364274662]
+[node name="ZoneSectionTitle" type="Label" parent="Scroll/PanelContainer/Panel" unique_id=1364274662]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "DEPLOYMENT ZONES"
 
-[node name="AttackerZone" type="VBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=729946293]
+[node name="AttackerZone" type="VBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=729946293]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="AttackerHeader" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel/AttackerZone" unique_id=2093337141]
+[node name="AttackerHeader" type="HBoxContainer" parent="Scroll/PanelContainer/Panel/AttackerZone" unique_id=2093337141]
 layout_mode = 2
 
-[node name="AttackerIcon" type="ColorRect" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerHeader" unique_id=916235924]
+[node name="AttackerIcon" type="ColorRect" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerHeader" unique_id=916235924]
 custom_minimum_size = Vector2(12, 12)
 layout_mode = 2
 mouse_filter = 2
 color = Color(0, 0.5, 1, 0.6)
 
-[node name="AttackerLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerHeader" unique_id=504147424]
+[node name="AttackerLabel" type="Label" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerHeader" unique_id=504147424]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "  Attacker"
 
-[node name="AttackerSpacer" type="Control" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerHeader" unique_id=425013492]
+[node name="AttackerSpacer" type="Control" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerHeader" unique_id=425013492]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="AttackerGrid" type="GridContainer" parent="MainVBox/Split/Scroll/Panel/AttackerZone" unique_id=705311959]
+[node name="AttackerGrid" type="GridContainer" parent="Scroll/PanelContainer/Panel/AttackerZone" unique_id=705311959]
 layout_mode = 2
 columns = 4
 
-[node name="AXL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=2070185070]
+[node name="AXL" type="Label" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=2070185070]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "X"
 
-[node name="AYL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=473079932]
+[node name="AYL" type="Label" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=473079932]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "Y"
 
-[node name="AWL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=151142313]
+[node name="AWL" type="Label" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=151142313]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "W"
 
-[node name="AHL" type="Label" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=258405533]
+[node name="AHL" type="Label" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=258405533]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "H"
 
-[node name="AttackerX" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=1939702685]
+[node name="AttackerX" type="SpinBox" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=1939702685]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -246,7 +226,7 @@ max_value = 10000.0
 step = 10.0
 value = 50.0
 
-[node name="AttackerY" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=8118422]
+[node name="AttackerY" type="SpinBox" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=8118422]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -255,7 +235,7 @@ max_value = 10000.0
 step = 10.0
 value = 300.0
 
-[node name="AttackerW" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=58056874]
+[node name="AttackerW" type="SpinBox" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=58056874]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -264,7 +244,7 @@ max_value = 10000.0
 step = 10.0
 value = 200.0
 
-[node name="AttackerH" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/AttackerZone/AttackerGrid" unique_id=180081305]
+[node name="AttackerH" type="SpinBox" parent="Scroll/PanelContainer/Panel/AttackerZone/AttackerGrid" unique_id=180081305]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -273,57 +253,57 @@ max_value = 10000.0
 step = 10.0
 value = 300.0
 
-[node name="DefenderZone" type="VBoxContainer" parent="MainVBox/Split/Scroll/Panel" unique_id=2030608959]
+[node name="DefenderZone" type="VBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=2030608959]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="DefenderHeader" type="HBoxContainer" parent="MainVBox/Split/Scroll/Panel/DefenderZone" unique_id=1245958000]
+[node name="DefenderHeader" type="HBoxContainer" parent="Scroll/PanelContainer/Panel/DefenderZone" unique_id=1245958000]
 layout_mode = 2
 
-[node name="DefenderIcon" type="ColorRect" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderHeader" unique_id=822657645]
+[node name="DefenderIcon" type="ColorRect" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderHeader" unique_id=822657645]
 custom_minimum_size = Vector2(12, 12)
 layout_mode = 2
 mouse_filter = 2
 color = Color(1, 0.2, 0.2, 0.6)
 
-[node name="DefenderLabel" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderHeader" unique_id=1954332001]
+[node name="DefenderLabel" type="Label" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderHeader" unique_id=1954332001]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "  Defender"
 
-[node name="DefenderSpacer" type="Control" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderHeader" unique_id=1797693578]
+[node name="DefenderSpacer" type="Control" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderHeader" unique_id=1797693578]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DefenderGrid" type="GridContainer" parent="MainVBox/Split/Scroll/Panel/DefenderZone" unique_id=854460740]
+[node name="DefenderGrid" type="GridContainer" parent="Scroll/PanelContainer/Panel/DefenderZone" unique_id=854460740]
 layout_mode = 2
 columns = 4
 
-[node name="DXL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1273564542]
+[node name="DXL" type="Label" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=1273564542]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "X"
 
-[node name="DYL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=592671256]
+[node name="DYL" type="Label" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=592671256]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "Y"
 
-[node name="DWL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=983667259]
+[node name="DWL" type="Label" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=983667259]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "W"
 
-[node name="DHL" type="Label" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1267659215]
+[node name="DHL" type="Label" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=1267659215]
 self_modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "H"
 
-[node name="DefenderX" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1194337665]
+[node name="DefenderX" type="SpinBox" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=1194337665]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -332,7 +312,7 @@ max_value = 10000.0
 step = 10.0
 value = 1350.0
 
-[node name="DefenderY" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=79348833]
+[node name="DefenderY" type="SpinBox" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=79348833]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -341,7 +321,7 @@ max_value = 10000.0
 step = 10.0
 value = 300.0
 
-[node name="DefenderW" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1627340592]
+[node name="DefenderW" type="SpinBox" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=1627340592]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -350,7 +330,7 @@ max_value = 10000.0
 step = 10.0
 value = 200.0
 
-[node name="DefenderH" type="SpinBox" parent="MainVBox/Split/Scroll/Panel/DefenderZone/DefenderGrid" unique_id=1838552815]
+[node name="DefenderH" type="SpinBox" parent="Scroll/PanelContainer/Panel/DefenderZone/DefenderGrid" unique_id=1838552815]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
@@ -358,3 +338,81 @@ min_value = -10000.0
 max_value = 10000.0
 step = 10.0
 value = 300.0
+
+[node name="BiomeHSep" type="HSeparator" parent="Scroll/PanelContainer/Panel" unique_id=1137434754]
+layout_mode = 2
+
+[node name="BiomeSectionTitle" type="Label" parent="Scroll/PanelContainer/Panel" unique_id=636582500]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "BIOMES"
+
+[node name="BiomeToolbar" type="HBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=465668333]
+layout_mode = 2
+
+[node name="BiomeType" type="OptionButton" parent="Scroll/PanelContainer/Panel/BiomeToolbar" unique_id=1616323187]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddBiome" type="Button" parent="Scroll/PanelContainer/Panel/BiomeToolbar" unique_id=1133934593]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add"
+
+[node name="DeleteBiome" type="Button" parent="Scroll/PanelContainer/Panel/BiomeToolbar" unique_id=1727638972]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Del"
+
+[node name="BiomeLayerRow" type="HBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=1209125224]
+layout_mode = 2
+
+[node name="BiomeLayerLabel" type="Label" parent="Scroll/PanelContainer/Panel/BiomeLayerRow" unique_id=455992939]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Layer"
+
+[node name="BiomeLayer" type="OptionButton" parent="Scroll/PanelContainer/Panel/BiomeLayerRow" unique_id=256593498]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+
+[node name="SandBagHSep" type="HSeparator" parent="Scroll/PanelContainer/Panel" unique_id=582252593]
+layout_mode = 2
+
+[node name="SandBagSectionTitle" type="Label" parent="Scroll/PanelContainer/Panel" unique_id=1251191689]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SAND BAGS"
+
+[node name="SandBagToolbar" type="HBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=1736784579]
+layout_mode = 2
+
+[node name="AddSandBag" type="Button" parent="Scroll/PanelContainer/Panel/SandBagToolbar" unique_id=1234567890]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Add Sand Bag"
+
+[node name="DeleteSandBag" type="Button" parent="Scroll/PanelContainer/Panel/SandBagToolbar" unique_id=1234567891]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Del"
+
+[node name="SandBagLayerRow" type="HBoxContainer" parent="Scroll/PanelContainer/Panel" unique_id=361246382]
+layout_mode = 2
+
+[node name="SandBagLayerLabel" type="Label" parent="Scroll/PanelContainer/Panel/SandBagLayerRow" unique_id=242689381]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Layer"
+
+[node name="SandBagLayer" type="OptionButton" parent="Scroll/PanelContainer/Panel/SandBagLayerRow" unique_id=1829190750]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
